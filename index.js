@@ -195,55 +195,55 @@ client.on("ready", async () => {
             tradeData.RSI["60min"].readyToTrade &&
             tradeData.RSI.daily.readyToTrade
           ) {
-          }
-          //Alert
-          const date = new Date().toISOString();
-          const link =
-            "https://vn.tradingview.com/chart?symbol=" + tradeData.currency;
-          const name = date
-            .split("-")
-            .join("")
-            .split(":")
-            .join("")
-            .split(".")
-            .join("");
-          const browser = await puppeteer.launch({
-            args: ["--no-sandbox"],
-          });
-          const page = await browser.newPage();
-          await page.setViewport({ width: 1920, height: 1080 });
-          await page.goto(link, {waitUntil: "networkidle0"});
-          await page.waitForSelector(".wrap-1a1_EyKG");
-          await page.screenshot({ path: name + ".png" });
-          await browser.close();
-          const embed = new Discord.MessageEmbed()
-            .setTitle("Trade Trade Trade!!!")
-            .setColor("#e58e26")
-            .setDescription(
-              `\n<@410321759221579786> ` +
-                date +
-                "\n" +
-                tradeData.currency +
-                "\nWait " +
-                tradeData.MACD.daily.signal +
-                "\n" +
-                link
+            //Alert
+            const date = new Date().toISOString();
+            const link =
+              "https://vn.tradingview.com/chart?symbol=" + tradeData.currency;
+            const name = date
+              .split("-")
+              .join("")
+              .split(":")
+              .join("")
+              .split(".")
+              .join("");
+            const browser = await puppeteer.launch({
+              args: ["--no-sandbox"],
+            });
+            const page = await browser.newPage();
+            await page.setViewport({ width: 1920, height: 1080 });
+            await page.goto(link, { waitUntil: "networkidle0" });
+            await page.waitForSelector(".i-no-scroll");
+            await page.screenshot({ path: name + ".png" });
+            await browser.close();
+            const embed = new Discord.MessageEmbed()
+              .setTitle("Trade Trade Trade!!!")
+              .setColor("#e58e26")
+              .setDescription(
+                `\n<@410321759221579786> ` +
+                  date +
+                  "\n" +
+                  tradeData.currency +
+                  "\nWait " +
+                  tradeData.MACD.daily.signal +
+                  "\n" +
+                  link
+              );
+            await alertTradingChannel.send({
+              files: [__dirname + `/${name}.png`],
+              embed,
+            });
+
+            fs.unlink(__dirname + `/${name}.png`, (err) => {
+              if (err) {
+                throw err;
+              }
+
+              console.log("File is deleted.");
+            });
+          } else
+            alertTradingChannel.send(
+              "Tao vẫn đang soi cặp " + tradeData.currency + " - Đừng nóng!"
             );
-          await alertTradingChannel.send({
-            files: [__dirname + `/${name}.png`],
-            embed,
-          });
-
-          fs.unlink(__dirname + `/${name}.png`, (err) => {
-            if (err) {
-              throw err;
-            }
-
-            console.log("File is deleted.");
-          });
-          alertTradingChannel.send(
-            "Tao vẫn đang soi cặp " + tradeData.currency + " - Đừng nóng!"
-          );
         }, x);
       } catch (error) {
         console.log(error);
@@ -254,7 +254,7 @@ client.on("ready", async () => {
       `Bây giờ là ${new Date().toUTCString()} - Round ${round}`
     );
     round += 1;
-  }, 60000);
+  }, 1800000);
 });
 
 client.on("message", (msg) => {
