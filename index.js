@@ -4,7 +4,6 @@ const axios = require("axios");
 const Pageres = require("pageres");
 const fs = require("fs");
 const keepAlive = require("./server");
-const app = require("node-server-screenshot");
 
 const token = process.env["DISCORDJS_BOT_TOKEN"];
 const apiKey = process.env["API_KEY"];
