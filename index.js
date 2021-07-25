@@ -197,50 +197,51 @@ client.on("ready", async () => {
             tradeData.RSI["60min"].readyToTrade &&
             tradeData.RSI.daily.readyToTrade
           ) {
-            //Alert
-            const date = new Date().toISOString();
-            const link =
-              "https://vn.tradingview.com/chart?symbol=" + tradeData.currency;
-            const name = date
-              .split("-")
-              .join("")
-              .split(":")
-              .join("")
-              .split(".")
-              .join("");
-            await new Pageres({ delay: 2, filename: name })
-              .src(
-                "https://uk.tradingview.com/chart?symbol=" + tradeData.currency,
-                ["1920x1080"]
-              )
-              .dest(__dirname)
-              .run();
-            const embed = new Discord.MessageEmbed()
-              .setTitle("Trade Trade Trade!!!")
-              .setColor("#e58e26")
-              .setDescription(
-                `\n<@410321759221579786> ` +
-                date +
-                "\n" +
-                tradeData.currency +
-                "\nWait " +
-                tradeData.MACD.daily.signal +
-                "\n" +
-                link
-              );
-            await alertTradingChannel.send({
-              files: [__dirname + `/${name}.png`],
-              embed,
-            });
             
-            fs.unlink(__dirname + `/${name}.png`, (err) => {
-              if (err) {
-                throw err;
-              }
-
-              console.log("File is deleted.");
-            });
           }
+          //Alert
+          const date = new Date().toISOString();
+          const link =
+            "https://vn.tradingview.com/chart?symbol=" + tradeData.currency;
+          const name = date
+            .split("-")
+            .join("")
+            .split(":")
+            .join("")
+            .split(".")
+            .join("");
+          await new Pageres({ delay: 2, filename: name })
+            .src(
+              "https://uk.tradingview.com/chart?symbol=" + tradeData.currency,
+              ["1920x1080"]
+            )
+            .dest(__dirname)
+            .run();
+          const embed = new Discord.MessageEmbed()
+            .setTitle("Trade Trade Trade!!!")
+            .setColor("#e58e26")
+            .setDescription(
+              `\n<@410321759221579786> ` +
+              date +
+              "\n" +
+              tradeData.currency +
+              "\nWait " +
+              tradeData.MACD.daily.signal +
+              "\n" +
+              link
+            );
+          await alertTradingChannel.send({
+            files: [__dirname + `/${name}.png`],
+            embed,
+          });
+          
+          fs.unlink(__dirname + `/${name}.png`, (err) => {
+            if (err) {
+              throw err;
+            }
+
+            console.log("File is deleted.");
+          });
           alertTradingChannel.send("Tao vẫn đang soi cặp " + tradeData.currency + " - Đừng nóng!");
         }, x);
       } catch (error) {
