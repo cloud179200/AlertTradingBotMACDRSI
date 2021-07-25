@@ -1,9 +1,9 @@
 require("dotenv").config();
 const Discord = require("discord.js");
 const axios = require("axios");
-const Pageres = require("pageres");
 const fs = require("fs");
 const keepAlive = require("./server");
+const puppeteer = require("puppeteer");
 
 const token = process.env["DISCORDJS_BOT_TOKEN"];
 const apiKey = process.env["API_KEY"];
@@ -20,7 +20,7 @@ const getCurrencyAnalysis = async (firstCurrency, secondCurrency) => {
     const promisesMACD = ["30min", "60min", "daily"].map(async (tf) => {
       let url = `https://www.alphavantage.co/query?function=MACD&symbol=${
         firstCurrency + secondCurrency
-        }&interval=${tf}&series_type=close&apikey=${apiKey}`;
+      }&interval=${tf}&series_type=close&apikey=${apiKey}`;
 
       const res = await axios.default.get(url);
       const data = res.data;
@@ -45,7 +45,7 @@ const getCurrencyAnalysis = async (firstCurrency, secondCurrency) => {
     const promisesRSI = ["60min", "daily"].map(async (tf) => {
       let url = `https://www.alphavantage.co/query?function=RSI&symbol=${
         firstCurrency + secondCurrency
-        }&interval=${tf}&time_period=14&series_type=close&apikey=${apiKey}`;
+      }&interval=${tf}&time_period=14&series_type=close&apikey=${apiKey}`;
 
       const res = await axios.default.get(url);
       const data = res.data;
@@ -78,7 +78,6 @@ const getCurrencyAnalysis = async (firstCurrency, secondCurrency) => {
 
 client.on("ready", async () => {
   console.log(`Logged in as ${client.user.id}!`);
-
   alertTradingChannel = client.channels.cache.find(
     (channel) => channel.id === "864566960624500776"
   );
@@ -114,13 +113,13 @@ client.on("ready", async () => {
               let signal = "Not yet";
               const MACD_Minus_MACDSignal = Math.abs(
                 anals.technicalAnalysis.MACD -
-                anals.technicalAnalysis.MACD_Signal
+                  anals.technicalAnalysis.MACD_Signal
               );
               if (MACD_Minus_MACDSignal < 0.0005) {
                 readyToTrade = true;
                 signal =
                   anals.technicalAnalysis.MACD >
-                    anals.technicalAnalysis.MACD_Signal
+                  anals.technicalAnalysis.MACD_Signal
                     ? "Sell"
                     : "Buy";
               }
@@ -131,13 +130,13 @@ client.on("ready", async () => {
               let signal = "Not yet";
               const MACD_Minus_MACDSignal = Math.abs(
                 anals.technicalAnalysis.MACD -
-                anals.technicalAnalysis.MACD_Signal
+                  anals.technicalAnalysis.MACD_Signal
               );
               if (MACD_Minus_MACDSignal < 0.0005) {
                 readyToTrade = true;
                 signal =
                   anals.technicalAnalysis.MACD >
-                    anals.technicalAnalysis.MACD_Signal
+                  anals.technicalAnalysis.MACD_Signal
                     ? "Sell"
                     : "Buy";
               }
@@ -148,13 +147,13 @@ client.on("ready", async () => {
               let signal = "Not yet";
               const MACD_Minus_MACDSignal = Math.abs(
                 anals.technicalAnalysis.MACD -
-                anals.technicalAnalysis.MACD_Signal
+                  anals.technicalAnalysis.MACD_Signal
               );
               if (MACD_Minus_MACDSignal < 0.001) {
                 readyToTrade = true;
                 signal =
                   anals.technicalAnalysis.MACD >
-                    anals.technicalAnalysis.MACD_Signal
+                  anals.technicalAnalysis.MACD_Signal
                     ? "Sell"
                     : "Buy";
               }
@@ -196,7 +195,6 @@ client.on("ready", async () => {
             tradeData.RSI["60min"].readyToTrade &&
             tradeData.RSI.daily.readyToTrade
           ) {
-            
           }
           //Alert
           const date = new Date().toISOString();
@@ -209,31 +207,33 @@ client.on("ready", async () => {
             .join("")
             .split(".")
             .join("");
-          await new Pageres({ delay: 2, filename: name })
-            .src(
-              "https://uk.tradingview.com/chart?symbol=" + tradeData.currency,
-              ["1920x1080"]
-            )
-            .dest(__dirname)
-            .run();
+          const browser = await puppeteer.launch({
+            headless: true,
+            args: ["--no-sandbox",'--disable-setuid-sandbox'],
+          });
+          const page = await browser.newPage();
+          await page.setViewport({ width: 1920, height: 1080 });
+          await page.goto(link);
+          await page.screenshot({ path: name + ".png" });
+          await browser.close();
           const embed = new Discord.MessageEmbed()
             .setTitle("Trade Trade Trade!!!")
             .setColor("#e58e26")
             .setDescription(
               `\n<@410321759221579786> ` +
-              date +
-              "\n" +
-              tradeData.currency +
-              "\nWait " +
-              tradeData.MACD.daily.signal +
-              "\n" +
-              link
+                date +
+                "\n" +
+                tradeData.currency +
+                "\nWait " +
+                tradeData.MACD.daily.signal +
+                "\n" +
+                link
             );
           await alertTradingChannel.send({
             files: [__dirname + `/${name}.png`],
             embed,
           });
-          
+
           fs.unlink(__dirname + `/${name}.png`, (err) => {
             if (err) {
               throw err;
@@ -241,14 +241,18 @@ client.on("ready", async () => {
 
             console.log("File is deleted.");
           });
-          alertTradingChannel.send("Tao vẫn đang soi cặp " + tradeData.currency + " - Đừng nóng!");
+          alertTradingChannel.send(
+            "Tao vẫn đang soi cặp " + tradeData.currency + " - Đừng nóng!"
+          );
         }, x);
       } catch (error) {
         console.log(error);
       }
     });
 
-    alertTradingChannel.send(`Bây giờ là ${new Date().toUTCString()} - Round ${round}`);
+    alertTradingChannel.send(
+      `Bây giờ là ${new Date().toUTCString()} - Round ${round}`
+    );
     round += 1;
   }, 60000);
 });
