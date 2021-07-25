@@ -212,7 +212,8 @@ client.on("ready", async () => {
           });
           const page = await browser.newPage();
           await page.setViewport({ width: 1920, height: 1080 });
-          await page.goto(link, {waitUntil: "domcontentloaded"});
+          await page.goto(link, {waitUntil: "networkidle0"});
+          await page.waitForSelector(".wrap-1a1_EyKG");
           await page.screenshot({ path: name + ".png" });
           await browser.close();
           const embed = new Discord.MessageEmbed()
