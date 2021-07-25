@@ -7,8 +7,8 @@ server.all("/", (req, res) => {
 })
 
 const keepAlive = () => {
-  server.listen(3000, () => {
-    console.log("Running at port 3000");
+  server.listen(process.env.PORT || 3000, () => {
+    console.log("Running at port " + process.env.PORT || 3000);
   })
 }
 
