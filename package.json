@@ -1,0 +1,16 @@
+{
+  "name": "testsavefile",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "capture-website": "^2.0.2",
+    "pageres": "^6.2.3",
+    "pupeteer": "0.0.1"
+  }
+}
