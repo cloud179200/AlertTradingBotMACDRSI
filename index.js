@@ -90,7 +90,7 @@ client.on("ready", async () => {
     let x = 60000;
 
     currencyList.forEach((coupleCurrency) => {
-      x += 70000;
+      x += 140000;
       try {
         const [firstCurrency, secondCurrency] = coupleCurrency.split("-");
         const timing = client.setTimeout(async () => {
