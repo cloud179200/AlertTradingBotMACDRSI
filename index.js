@@ -10,7 +10,6 @@ const apiKey = process.env["API_KEY"];
 const client = new Discord.Client();
 const PREFIX = "$";
 let alertTradingChannel;
-let start = false;
 let round = 1;
 
 const getCurrencyAnalysis = async (firstCurrency, secondCurrency) => {
@@ -84,7 +83,6 @@ client.on("ready", async () => {
   alertTradingChannel.send("Tao đã trở lại!!!");
 
   client.setInterval(async () => {
-    if (!start) return;
     //!rest api, send mess here...............................
     const currencyList = ["GBP-USD", "GBP-JPY", "EUR-NZD", "USD-CAD"];
     let x = 60000;
@@ -254,7 +252,7 @@ client.on("ready", async () => {
       `Bây giờ là ${new Date().toUTCString()} - Round ${round}`
     );
     round += 1;
-  }, 1800000);
+  }, 3600000);
 });
 
 client.on("message", (msg) => {
@@ -268,14 +266,8 @@ client.on("message", (msg) => {
     if (author.id == "410321759221579786") {
       switch (command) {
         case "start":
-          start && msg.channel.send("Alert is running...");
-          !start && msg.channel.send("Alert has started!");
-          start = true;
           break;
         case "stop":
-          start && msg.channel.send("Alert has stop!");
-          !start && msg.channel.send("Alert already stop!");
-          start = false;
           break;
       }
     } else msg.channel.send("Đừng hòng điểu khiển tao con chó giả danh.");
